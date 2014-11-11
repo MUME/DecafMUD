@@ -3,6 +3,7 @@
  * http://decafmud.stendec.me
  *
  * Copyright 2010, Stendec <stendec365@gmail.com>
+ * Licensed under the MIT license.
  */
 
 /**
