@@ -97,7 +97,7 @@ DecafWebSocket.prototype.connect = function() {
 	
 	// Set the path variable
 	var path = this.decaf.options.set_socket.wspath;
-	if ( ! path ) {
+	if ( path === undefined ) {
 		path = 'port_' + this.decaf.options.port; }
 	
 	// Get the hostname
