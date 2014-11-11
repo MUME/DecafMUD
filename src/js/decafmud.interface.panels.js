@@ -358,22 +358,25 @@ SimpleInterface.prototype.connected = function() {
 
 /** Called by Decaf when it's trying to connect. */
 SimpleInterface.prototype.connecting = function() {
-  this.print_msg("Trying to connect...");
-  if (this.decaf.options.socket == "websocket") {
-    this.display.message("<span>You are connecting using <i>websockets</i> " +
-      "on port " + this.decaf.options.set_socket.wsport + ".  If this does " +
-      "not work (for example because the port is blocked or you have an " +
-      "older version of websockets), you can connecting with flash.  To do " +
-      "so, open <a href=\"web_client.html?socket=flash\">the flash version</a> " +
-      "instead.</span>");
-  }
-  else {
-    this.display.message("<span>You are connecting using <i>flash</i> " +
-      "on port " + this.decaf.options.port + ".  To connect using " +
-      "websockets, make sure you have an up-to-date browser which " + 
-      "supports this, and open " +
-      "<a href=\"web_client.html?socket=websocket\">the websocket version</a> " +
-      "instead.</span>");
+  this.print_msg(this.decaf.options.set_interface.msg_connecting);
+  if (this.decaf.options.set_interface.connect_hint)
+  {
+    if (this.decaf.options.socket == "websocket") {
+      this.display.message("<span>You are connecting using <i>websockets</i> " +
+        "on port " + this.decaf.options.set_socket.wsport + ".  If this does " +
+        "not work (for example because the port is blocked or you have an " +
+        "older version of websockets), you can connecting with flash.  To do " +
+        "so, open <a href=\"web_client.html?socket=flash\">the flash version</a> " +
+        "instead.</span>");
+    }
+    else {
+      this.display.message("<span>You are connecting using <i>flash</i> " +
+        "on port " + this.decaf.options.port + ".  To connect using " +
+        "websockets, make sure you have an up-to-date browser which " +
+        "supports this, and open " +
+        "<a href=\"web_client.html?socket=websocket\">the websocket version</a> " +
+        "instead.</span>");
+    }
   }
   this.updateIcon(this.ico_connected,
                   "DecafMUD is attempting to connect.".tr(this.decaf),

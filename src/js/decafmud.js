@@ -1831,7 +1831,9 @@ DecafMUD.options = {
 		
 		msg_connect		: 'Press Enter to connect and type here...',
 		msg_connecting	: 'DecafMUD is attempting to connect...',
-		msg_empty		: 'Type commands here, or use the Up and Down arrows to browse your recently used commands.'
+		msg_empty		: 'Type commands here, or use the Up and Down arrows to browse your recently used commands.',
+
+		connect_hint	: true
 	},
 	
 	// Telnet Settings
