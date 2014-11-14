@@ -467,7 +467,7 @@ SimpleInterface.prototype.setup = function() {
 
 	
 	// Should we go fullscreen automatically?
-	this.goFullOnResize = this.store.get('fullscreen-auto', true);
+	this.goFullOnResize = false; //this.store.get('fullscreen-auto', true);
 	
 	// Should we be starting in fullscreen?
 	var fs = this.store.get('fullscreen-start', this.decaf.options.set_interface.start_full);
