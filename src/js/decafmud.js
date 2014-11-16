@@ -967,6 +967,10 @@ if ( String.prototype.tr === undefined ) {
 DecafMUD.prototype.about = function() {
 	var abt = ["DecafMUD v{0} \u00A9 2010 Stendec"];
 	abt.push("http://decafmud.stendec.me/\n");
+
+	abt.push("Updated and improved by Pit from Discworld.");
+	abt.push("Further bugfixes and improvements by Waba from MUME.");
+	abt.push("https://github.com/waba4mume/DecafMUD\n");
 	
 	abt.push("DecafMUD is a web-based MUD client written in JavaScript, rather" +
 		" than a plugin like Flash or Java, making it load faster and react as" +
