@@ -1714,11 +1714,12 @@ SimpleInterface.prototype.handleInput = function(e) {
     this.input.select();
   }
 
-  // specific macro (in macro.js)
-  /*else if ( tryMacro(e.keyCode) ) {
+  // Support for MUD-specific key bindings
+  else if ( typeof window.tryExtraMacro !== 'undefined'
+      && tryExtraMacro(this.decaf, e.keyCode) ) {
     if (e.preventDefault) e.preventDefault();
     else e.returnValue = false;
-  }*/
+  }
 
   // PgUp
   else if ( e.keyCode === 33 ) {
