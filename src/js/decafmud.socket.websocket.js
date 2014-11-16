@@ -195,11 +195,19 @@ DecafWebSocket.prototype.onClose = function(websocket, event) {
  * @event
  * @param {Object} event An event containing the received data.*/
 DecafWebSocket.prototype.onMessage = function(websocket, event) {
+	// Chrome and Mozilla work great with this
 	var reader = new FileReader();
 	reader.onload = function(e) {
-	    this.decaf.socketData(e.target.result);
+		var u8array = new Uint8Array(e.target.result);
+		var binstr = '';
+		var i;
+
+		for (i = 0; i < u8array.length; ++i)
+			binstr += String.fromCharCode(u8array[i]);
+
+		this.decaf.socketData(binstr);
 	}.bind(this);
-	reader.readAsBinaryString(event.data);
+	reader.readAsArrayBuffer(event.data);
 }
 
 // Add this to DecafMUD
