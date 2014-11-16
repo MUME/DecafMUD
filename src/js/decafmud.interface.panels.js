@@ -464,7 +464,8 @@ SimpleInterface.prototype.setup = function() {
 
 	
 	// Should we go fullscreen automatically?
-	this.goFullOnResize = this.store.get('fullscreen-auto', true);
+        // NB: disabled, gets confused by browser-based fullscreen (F11)
+	this.goFullOnResize = false; //this.store.get('fullscreen-auto', true);
 	
 	// Should we be starting in fullscreen?
 	var fs = this.store.get('fullscreen-start', this.decaf.options.set_interface.start_full);
@@ -1308,7 +1309,6 @@ SimpleInterface.prototype.old_width = -1;
 SimpleInterface.prototype.old_fs = false;
 
 /** Resize the screen elements to fit together nicely. */
-SimpleInterface.prototype.goFullOnResize = true;
 SimpleInterface.prototype.resizeScreen = function(showSize,force) {
 	// Are we fullscreen now when we weren't before?
 	if ( this.goFullOnResize ) {
