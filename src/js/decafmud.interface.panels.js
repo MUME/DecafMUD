@@ -446,7 +446,6 @@ SimpleInterface.prototype.setup = function() {
         this.display.id = 'mud-display';
 	this.decaf.display = this.display;
 
-        /*
         // Make the menu
         var menus = get_menus();
         for (i = 0; i < menus.length; i+=3) {
@@ -454,8 +453,7 @@ SimpleInterface.prototype.setup = function() {
             menus[i],
             menus[i+1].tr(this.decaf),
             undefined,
-            undefined,
-//            menus[i+2].tr(this.decaf),
+            menus[i+2].tr(this.decaf),
             1,
             true,
             false,
@@ -463,47 +461,13 @@ SimpleInterface.prototype.setup = function() {
             function(i) {return function(e) {toggle_menu(i/3);}} (i)
           );
         }
-        */
 
 	
 	// Should we go fullscreen automatically?
-	this.goFullOnResize = false; //this.store.get('fullscreen-auto', true);
+	this.goFullOnResize = this.store.get('fullscreen-auto', true);
 	
 	// Should we be starting in fullscreen?
 	var fs = this.store.get('fullscreen-start', this.decaf.options.set_interface.start_full);
-	
-	// Create the fullscreen button.
-	this.fsbutton = this.tbNew(
-		"Fullscreen".tr(this.decaf),
-		undefined,
-		"Click to enter fullscreen mode.".tr(this.decaf),
-		1,
-		true,
-		fs,
-		undefined,
-		function(e){ this.click_fsbutton(e); }
-	);
-	
-	// Create the log button.
-	this.logbutton = this.tbNew(
-		"Logs".tr(this.decaf),
-		undefined,
-		"Click to open a window containing this session's logs.".tr(this.decaf),
-		0,
-		true,
-		false,
-		undefined,
-		function(e){ this.showLogs(); }
-	);
-	
-	// Create a settings button.
-	//this.stbutton = this.tbNew(
-	//	"Settings".tr(this.decaf),
-	//	undefined,
-	//	"Click to change DecafMUD's settings.".tr(this.decaf),
-	//	1, true, false, undefined,
-	//	function(e){ this.showSettings(); }
-	//);
 	
 	// Create the connected notification icon.
 	this.ico_connected = this.addIcon("You are currently disconnected.".tr(this.decaf), '', 'connectivity disconnected');
@@ -516,52 +480,6 @@ SimpleInterface.prototype.setup = function() {
 		if ( ! this._resizeToolbar() ) {
 			this.resizeScreen(false); }
 	}
-}
-
-/** Quick and dirty function for saving logs. */
-SimpleInterface.prototype.showLogs = function() {
-	//var wd = win.document;
-	
-	// Build some CSS.
-	var css = '', css2 = '';
-	if ( window.getComputedStyle ) {
-		var node = this.display.display, count=0;
-		while(node) {
-			count += 1;
-			if(count>15){alert('Too high count!');return;}
-			var style = getComputedStyle(node,null);
-			if (!style.backgroundColor ||
-				style.backgroundColor === 'transparent' ||
-				style.backgroundColor.substr(0,5) === 'rgba(') {
-				if(node === document.body) { break; }
-				node = node.parentNode;
-			} else {
-				css = 'background-color:' + style.backgroundColor + ';';
-				break;
-			}
-		}
-		if(!css) { css = 'background-color:#000;'; }
-		var style = getComputedStyle(this.display.display,null);
-		css = 'body{'+css+'color:'+style.color+';}';
-		
-		css2 = 'div{font-family:'+style.fontFamily+';font-size:'+style.fontSize+';}';
-	} else {
-		css = 'body{background:#000;color:#C0C0C0;}';
-		css2= 'div{font-family:monospace;}';
-	}
-	
-	var url = 'data:text/html,';
-	
-	url += '<html><head><title>';
-	url += 'DecafMUD Session Log'.tr(this.decaf);
-	url += '</title><style>'+css+css2+'</style></head><body>';
-	url += '<h1>';
-	url += 'DecafMUD Session Log'.tr(this.decaf);
-	url += '</h2>';
-	url += '<div>' + this.display.display.innerHTML + '</div>';
-	url += '</body></html>';
-	
-	var win = window.open(url,'log-window','width=700,height=400,directories=no,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes');
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -832,6 +750,24 @@ SimpleInterface.prototype.tbNew = function(btnid,text,icon,tooltip,type,enabled,
 /** Resize the toolbar when adding/changing/removing a button. */
 SimpleInterface.prototype.toolbarPadding = undefined;
 SimpleInterface.prototype._resizeToolbar = function() {
+  var always = true,
+      css = this.toolbar.style.cssText,
+      ret = false;
+
+  // make sure the display leaves enough space for the toolbar
+  if ( this.display && this.toolbarPadding !== this.toolbar.clientHeight ) {
+    this.display.shouldScroll();
+    this.el_display.style.paddingTop = this.toolbar.clientHeight + 'px';
+    this.toolbarPadding = this.toolbar.clientHeight;
+    this.resizeScreen(false,true);
+    this.display.doScroll();
+    ret = true;
+  } else {
+    this.toolbarPadding = this.toolbar.clientHeight;
+  }
+
+  return ret;
+/*
 	var tbar = this.store.get('toolbar-position','top-left'),
 		always = this.store.get('toolbar-always',2),
 		css = this.toolbar.style.cssText,
@@ -909,6 +845,7 @@ SimpleInterface.prototype._resizeToolbar = function() {
 	this.toolbar.style.cssText = css;
 	
 	return ret;
+*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1246,7 +1183,6 @@ SimpleInterface.prototype._resizeTray = function() {
 ///////////////////////////////////////////////////////////////////////////////
 
 /** For when you click the fullscreen div. */
-/*
 SimpleInterface.prototype.click_fsbutton = function(e) {
 	if ( this.container.className.indexOf('fullscreen') === -1 ) {
 		this.enter_fs();
@@ -1254,7 +1190,6 @@ SimpleInterface.prototype.click_fsbutton = function(e) {
 		this.exit_fs();
 	}
 }
-*/
 
 /** Scroll position for when leaving FS. */
 SimpleInterface.prototype.oldscrollX = undefined;
@@ -1263,7 +1198,6 @@ SimpleInterface.prototype.old_children = [];
 SimpleInterface.prototype.old_display = [];
 
 /** Enter fullscreen mode. */
-/*
 SimpleInterface.prototype.enter_fs = function(showSize) {
 	if ( this.container.className.indexOf('fullscreen') !== -1 ) { return; }
 
@@ -1287,10 +1221,6 @@ SimpleInterface.prototype.enter_fs = function(showSize) {
 	
 	// Set the className so it appears all big.
 	this.container.className += ' fullscreen';
-	
-	// Adjust the fs button.
-	this.tbPressed(this.fsbutton, true);
-	this.tbTooltip(this.fsbutton, "Click to exit fullscreen mode.".tr(this.decaf));
 	
 	// Hide all the other body elements.
 	for(var i=0;i<document.body.children.length;i++) {
@@ -1318,10 +1248,8 @@ SimpleInterface.prototype.enter_fs = function(showSize) {
 	if ( has_focus ) { this.input.focus(); }
 	if ( this.display ) { this.display.doScroll(); }
 }
-*/
 
 /** Exit fullscreen mode. */
-/*
 SimpleInterface.prototype.exit_fs = function() {
 	if ( this.old_parent === undefined ) { return; }
 	
@@ -1350,10 +1278,6 @@ SimpleInterface.prototype.exit_fs = function() {
 	}
 	this.container.className = classes.join(' ');
 	
-	// Adjust the fs button.
-	this.tbPressed(this.fsbutton, false);
-	this.tbTooltip(this.fsbutton, "Click to enter fullscreen mode.".tr(this.decaf));
-	
 	// Add the container back to the parent element.
 	if ( this.next_sib !== undefined && this.next_sib !== null ) {
 		this.old_parent.insertBefore(this.container, this.next_sib);
@@ -1376,7 +1300,6 @@ SimpleInterface.prototype.exit_fs = function() {
 	if ( has_focus ) { this.input.focus(); }
 	if ( this.display ) { this.display.doScroll(); }
 }
-*/
 
 /** Store the old size. */
 SimpleInterface.prototype.old_height = -1;

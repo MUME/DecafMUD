@@ -163,8 +163,8 @@
 	background-color: rgba(20,20,20,0.9);
 	border-color: #666;
 	border-color: rgba(113,113,113,0.9); }
-.decafmud.toolbar .button {
-	color: rgba(0,0,0,0); }
+/*.decafmud.toolbar .button {
+	color: rgba(0,0,0,0); }*/
 .decafmud.toolbar .button:hover,.decafmud.toolbar .button:focus,.decafmud.infobar .button:hover,.decafmud.infobar .button:focus {
 	background-color: #666;
 	background-color: rgba(113,113,113,0.9); }

@@ -1316,10 +1316,6 @@ DecafMUD.prototype.initFinal = function() {
 		}
 	}
 	
-	// Add an About button to the toolbar.
-	if ( this.ui.tbNew ) {
-		this.ui.tbNew("About".tr(this), function(){ this.decaf.about(); }); }
-	
 	// We're loaded. Try to connect.
 	this.loaded = true;
 	this.ui.endSplash();
@@ -1374,6 +1370,18 @@ DecafMUD.prototype.connectFail = function() {
 	// Set the timer.
 	var decaf = this;
 	this.conn_timer = setTimeout(function(){decaf.connectFail();},this.options.connect_timeout);
+}
+
+
+DecafMUD.prototype.reconnect = function() {
+  this.connect_try++;
+  if ( this.connect_try < this.options.reconnect_tries ) {
+    var d = this;
+    if ( d.ui && d.ui.connecting ) {
+      d.ui.connecting();
+    }
+    d.socket.connect();
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
