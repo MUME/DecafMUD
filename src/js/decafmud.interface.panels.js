@@ -141,7 +141,7 @@ var SimpleInterface = function(decaf) {
 	this.reset();
 	
 	// Listen to window resizing
-	addEvent(window,'resize',function() { si.resizeScreen(); });
+	addEvent(window, 'resize', this.resizeScreenFromEvent.bind(this, 'window resize'));
 
         // Make sure the input is focussed
         this.input.focus();
@@ -1357,6 +1357,10 @@ SimpleInterface.prototype.resizeScreen = function(showSize,force) {
 	if ( showSize !== false ) {
 		this.showSize(); }
 };
+
+SimpleInterface.prototype.resizeScreenFromEvent = function(source, event) {
+  this.resizeScreen(true, false);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // A sidebar for showing progress bars and the map                           //
