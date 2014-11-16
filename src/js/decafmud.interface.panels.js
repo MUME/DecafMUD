@@ -1242,6 +1242,7 @@ SimpleInterface.prototype.enter_fs = function(showSize) {
 	
 	// Resize and show the size.
 	this._resizeToolbar();
+	this.resizeScreen(showSize, false);
 	if ( showSize !== false ) { this.showSize(); }
 	
 	// Refocus input?
