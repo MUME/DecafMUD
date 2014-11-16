@@ -1709,6 +1709,8 @@ SimpleInterface.prototype.handleInput = function(e) {
     this.parseInput(this.input.value);
     this.saveInputInHistory();
     this.historyPosition = 0;
+    if (!this.decaf.options.set_interface.repeat_input)
+      this.input.value = '';
     this.input.select();
   }
 

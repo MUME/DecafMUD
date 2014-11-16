@@ -1835,6 +1835,7 @@ DecafMUD.options = {
 		multiline	: true,
 		clearonsend	: false,
 		focusinput	: true,
+		repeat_input    : true,
 		blurclass	: 'mud-input-blur',
 		
 		msg_connect		: 'Press Enter to connect and type here...',
