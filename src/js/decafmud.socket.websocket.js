@@ -38,13 +38,6 @@ var DecafWebSocket = function DecafWebSocket(decaf) {
 	this.decaf = decaf;
 }
 
-// Storage of all the WebSockets
-/** An associative array of WebSocket objects and their corresponding socket
- *  provider plugin instances. This is used internally with the event handlers
- *  to prevent an icky need for anonymous functions.
- * @type Object */
-DecafWebSocket.sockets = {};
-
 // State Variables
 DecafWebSocket.prototype.host = undefined;
 DecafWebSocket.prototype.port = undefined;
@@ -80,7 +73,6 @@ DecafWebSocket.prototype.setup = function() {
 DecafWebSocket.prototype.connect = function() {
 	// If we're connected, disconnect.
 	if ( this.connected && this.websocket ) {
-		delete DecafWebSocket.sockets[this.websocket];
 		this.websocket.close();
 		this.websocket = null; }
 	
@@ -125,18 +117,16 @@ DecafWebSocket.prototype.connect = function() {
 	this.decaf.debugString('WebSocket Connection String: ' + con);
 	
 	this.websocket = new WebSocket(con, 'binary');
-	DecafWebSocket.sockets[this.websocket] = this;
 	
-	this.websocket.onopen		= DecafWebSocket.onOpen;
-	this.websocket.onclose		= DecafWebSocket.onClose;
-	this.websocket.onmessage	= DecafWebSocket.onMessage;
+	this.websocket.onopen		= this.onOpen.bind(this, this.websocket);
+	this.websocket.onclose		= this.onClose.bind(this, this.websocket);
+	this.websocket.onmessage	= this.onMessage.bind(this, this.websocket);
 }
 
 /** Closes the current connection and cleans up the WebSocket object. */
 DecafWebSocket.prototype.close = function() {
 	this.connected = false;
 	if ( this.websocket ) {
-		delete DecafWebSocket.sockets[this.websocket];
 		this.websocket.close();
 		this.websocket = null; }
 }
@@ -175,13 +165,12 @@ DecafWebSocket.prototype.write = function(data) {
  *  to true and call {@link DecafMUD#socketConnected}.
  * @private
  * @event */
-DecafWebSocket.onOpen = function() {
-	var sock = DecafWebSocket.sockets[this];
+DecafWebSocket.prototype.onOpen = function(websocket, event) {
 	
 	// Are we connected?
-	if ( this.readyState === 1 ) {
-		sock.connected = true;
-		sock.decaf.socketConnected(); }
+	if ( websocket.readyState === 1 ) {
+		this.connected = true;
+		this.decaf.socketConnected(); }
 }
 
 /** Called when the WebSocket's onClose event fires. If the socket was
@@ -189,15 +178,15 @@ DecafWebSocket.onOpen = function() {
  *  false, clean up the WebSocket, and call {@link DecafMUD#socketClosed}.
  * @private
  * @event */
-DecafWebSocket.onClose = function() {
-	var sock = DecafWebSocket.sockets[this];
+DecafWebSocket.prototype.onClose = function(websocket, event) {
 	
 	// Were we connected?
-	if ( sock.connected ) {
-		sock.connected = false;
-		sock.decaf.socketClosed();
-		delete DecafWebSocket.sockets[this];
-		sock.websocket = null; }
+	if ( this.connected ) {
+		this.connected = false;
+		this.decaf.socketClosed();
+		if ( this.websocket == websocket )
+			this.websocket = null;
+	}
 }
 
 /** Called when the WebSocket's onMessage event fires. Simply pass the data
@@ -205,12 +194,11 @@ DecafWebSocket.onClose = function() {
  * @private
  * @event
  * @param {Object} event An event containing the received data.*/
-DecafWebSocket.onMessage = function(event) {
-	var sock = DecafWebSocket.sockets[this];
+DecafWebSocket.prototype.onMessage = function(websocket, event) {
 	var reader = new FileReader();
 	reader.onload = function(e) {
-	    sock.decaf.socketData(e.target.result);
-	};
+	    this.decaf.socketData(e.target.result);
+	}.bind(this);
 	reader.readAsBinaryString(event.data);
 }
 

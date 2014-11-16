@@ -1375,13 +1375,13 @@ DecafMUD.prototype.connectFail = function() {
 
 DecafMUD.prototype.reconnect = function() {
   this.connect_try++;
-  if ( this.connect_try < this.options.reconnect_tries ) {
+  //if ( this.connect_try < this.options.reconnect_tries ) {
     var d = this;
     if ( d.ui && d.ui.connecting ) {
       d.ui.connecting();
     }
     d.socket.connect();
-  }
+  //}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
