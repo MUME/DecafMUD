@@ -195,7 +195,7 @@ DecafWebSocket.prototype.onClose = function(websocket, event) {
  * @event
  * @param {Object} event An event containing the received data.*/
 DecafWebSocket.prototype.onMessage = function(websocket, event) {
-	// Chrome and Mozilla work great with this
+
 	var reader = new FileReader();
 	reader.onload = function(e) {
 		var u8array = new Uint8Array(e.target.result);
