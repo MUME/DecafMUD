@@ -84,7 +84,8 @@ var SimpleInterface = function(decaf) {
         this.mapdiv.style.display = 'none';
         this.sidebar.appendChild(this.mapdiv);
         
-	// Handle keypresses in scrollback.
+	// Handle keypresses and clicks in scrollback.
+	this.el_display.onmouseup = this.maybeFocusInput.bind(this);
 	addEvent(this.el_display,'keydown',function(e){si.displayKey(e)});
 	addEvent(this.sidebar,'keydown',function(e){si.displayKey(e)});
 	
@@ -122,7 +123,7 @@ var SimpleInterface = function(decaf) {
 	this.input.className = 'decafmud input';
 	this._input.insertBefore(this.input, this._input.firstChild);
 	this.container.appendChild(this._input);
-	
+
 	// Listen to input.
 	addEvent(this.input,'keydown', function(e){si.handleInput(e);});
 	
@@ -1623,6 +1624,23 @@ SimpleInterface.prototype.localEcho = function(echo) {
 	this.echo = echo;
 	
 	this.updateInput();
+}
+
+/** Called onmouseup in UI elements (atm, this.el_display). Clicking vaguely
+ * around the UI (to focus the browser window) should bring the focus to the
+ * input line, yet avoid to mess with on-purpose clicks (scrollback scrolling,
+ * scrollback selection).
+ */
+SimpleInterface.prototype.maybeFocusInput = function (e) {
+	var sel = getSelection();
+	if (sel && sel.toString() !== ''
+		&& this.el_display.contains(sel.focusNode))
+	{
+		this.decaf.debugString('not focusing this.input: selection active');
+		return;
+	}
+
+	this.input.focus();
 }
 
 /** Handle keypresses from the display element. */
