@@ -1324,6 +1324,7 @@ DecafMUD.prototype.initFinal = function() {
 	this.loaded = true;
 	this.ui.endSplash();
 	
+        /*
 	// If this is IE, show a warning.
 	if ( /MSIE/.test(navigator.userAgent) && this.ui.infoBar ) {
 		var msg = 'You may experience poor performance and UI glitches using ' +
@@ -1332,7 +1333,7 @@ DecafMUD.prototype.initFinal = function() {
 			'<a href="http://www.getfirefox.com">Mozilla Firefox</a> for ' +
 			'the best experience.';
 		this.ui.infoBar(msg.tr(this));
-	}
+	}*/
 	
 	if ( (!this.options.autoconnect) || (!this.socket.ready)) { return; }
 	this.connect();
