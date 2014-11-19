@@ -1528,7 +1528,11 @@ var iac_reg = /\xFF/g;
  *  to the display and stuff. Escape any IAC bytes.
  * @param {String} input The input to send to the server. */
 DecafMUD.prototype.sendInput = function(input) {
-	if ( ! this.socket ) { throw "We don't have a socket yet. Just wait a bit!"; }
+	if ( !this.socket || !this.socket.connected ) {
+		this.debugString("Cannot send input: not connected");
+		return;
+	}
+
 	this.socket.write(this.encode(input + '\r\n').replace(iac_reg, '\xFF\xFF'));
 	
 	if ( this.ui ) {
