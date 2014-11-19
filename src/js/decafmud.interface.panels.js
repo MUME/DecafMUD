@@ -144,6 +144,10 @@ var SimpleInterface = function(decaf) {
 	// Listen to window resizing
 	addEvent(window, 'resize', this.resizeScreenFromEvent.bind(this, 'window resize'));
 
+	// Neuters IE's F1 help popup
+	if ("onhelp" in window)
+		window.onhelp = function() { return false; };
+
         // Make sure the input is focussed
         this.input.focus();
 	
@@ -1731,6 +1735,12 @@ SimpleInterface.prototype.parseInput = function(inp) {
 /** Handle a key press in the INPUT element. For internal use. */
 SimpleInterface.prototype.handleInput = function(e) {
   if ( e.type !== 'keydown' ) { return; }
+
+  // Prevent F1 (help popup) and F5 (page refresh, ie. full reconnect)
+  // NB: F1 is not overridable in IE, we use an other trick for that (onhelp)
+  if ( e.keyCode == 112 || e.keyCode === 116 )
+    e.preventDefault();
+
   if ( e.keyCode === 13 ) {
     this.parseInput(this.input.value);
     this.saveInputInHistory();
