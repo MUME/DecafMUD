@@ -30,7 +30,7 @@ var toolbar_menus = [
      'Macros', 'menu_macros();',
      'Flush History', 'menu_history_flush();']
   ],
-  [ 'Help', 'menu_help', 'Get help with Discworld and Client problems.',
+  [ 'Help', 'menu_help', 'Info about DecafMUD and its usage.',
     ['Client Features', 'menu_features();',
      'About', 'menu_about();' ]
   ]
@@ -246,7 +246,7 @@ function menu_log(style) {
   }
   else {
     var currentTime = new Date();
-    txt = "<html><head><title>Discworld " + currentTime.getDate() +
+    txt = "<html><head><title>DecafMUD " + currentTime.getDate() +
       "/" + currentTime.getMonth() + "/" + currentTime.getFullYear()+
       "</title>\n<link rel=\"stylesheet\" href=\"mud-colors.css\" "+
       "type=\"text/css\" />\n</head><body>\n" + txt +
@@ -374,8 +374,8 @@ function menu_features() {
   // show the necessary help
   var el;
   add_element(pop, "h2", "Client Features");
-  add_element(pop, "p", "Decafmud is a basic mud client tailored "+
-    "to Discworld, with just a few features.");
+  add_element(pop, "p", "Decafmud is a basic mud client, "+
+    "with just a few features.");
   el = document.createElement("ul");
   pop.appendChild(el);
   add_element(el, "li", "To send multiple commands at once, separate "+
@@ -384,7 +384,7 @@ function menu_features() {
   add_element(el, "li", "You can browse your previous commands with "+
     "the up and down arrow keys.");
   add_element(el, "li", "The F1, F2, ... keys send the commands f1, "+
-    "f2, ... to the mud.  You can use Discworld's alias system to "+
+    "f2, ... to the mud.  You can use the MUD's alias system to "+
     "attach commands to this, for example \"alias f1 score\".  Use "+
     "\"help alias\" when logged in to the mud for more information.");
   add_element(el, "li", "You can use the numpad for quick "+
