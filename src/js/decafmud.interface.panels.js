@@ -1634,7 +1634,11 @@ SimpleInterface.prototype.localEcho = function(echo) {
 SimpleInterface.prototype.maybeFocusInput = function (e) {
 	var sel = getSelection();
 	if (sel && sel.toString() !== ''
-		&& this.el_display.contains(sel.focusNode))
+		/* IE10 workaround: sel.focusNode is typically a TextNode (not
+		 * an Element), but Node.contains() only works on IE10 if the
+		 * argument is an Element. parentNode gives us the parent
+		 * <span> Element, which is still a child of el_display. */
+		&& this.el_display.contains(sel.focusNode.parentNode))
 	{
 		this.decaf.debugString('not focusing this.input: selection active');
 		return;
