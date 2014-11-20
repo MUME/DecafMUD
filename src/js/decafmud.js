@@ -167,7 +167,7 @@ DecafMUD.last_id	= -1;
  * alert("You're using DecafMUD v" + DecafMUD.version.toString() + "!");
  * // You're using DecafMUD v0.9.0alpha!
  * @type Object */
-DecafMUD.version = {major: 0, minor: 9, micro: 0, flag: '',
+DecafMUD.version = {major: 0, minor: 9, micro: 1, flag: 'beta',
 	toString: function(){ return this.major+'.'+this.minor+'.'+this.micro+( this.flag ? '-' + this.flag : ''); } };
 
 // Default Values
