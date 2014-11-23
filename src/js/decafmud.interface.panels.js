@@ -148,6 +148,9 @@ var SimpleInterface = function(decaf) {
 	if ("onhelp" in window)
 		window.onhelp = function() { return false; };
 
+	// Prevent leaving the page by accident (backspace)
+	window.onbeforeunload = this.unloadPageFromEvent.bind(this);
+
         // Make sure the input is focussed
         this.input.focus();
 	
@@ -394,6 +397,16 @@ SimpleInterface.prototype.disconnected = function() {
   this.updateIcon(this.ico_connected,
                   "DecafMUD is currently not connected.".tr(this.decaf),
                   '', 'connectivity disconnected');
+}
+
+/** Event handler for onBeforeUnload. */
+SimpleInterface.prototype.unloadPageFromEvent = function(e) {
+	if (this.decaf.connected) {
+		return "You are still connected.";
+	}
+	else {
+		return;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
