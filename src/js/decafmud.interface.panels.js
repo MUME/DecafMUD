@@ -1811,6 +1811,10 @@ SimpleInterface.prototype.handleInput = function(e) {
     this.loadInput();
   }
 
+  // clear input quickly
+  else if ( e.keyCode == 8 && e.shiftKey === true ) {
+    this.input.value = '';
+  }
 }
 
 /** Handle blur and focus events on the INPUT element. */

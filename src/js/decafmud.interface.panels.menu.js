@@ -390,6 +390,9 @@ function menu_features() {
   add_element(el, "li", "You can use the numpad for quick "+
     "navigation.  Make sure you have the numlock key on for it to "+
     "work.");
+  add_element(el, "li", "You can clear the input field immediately "+
+    "using shift+backspace (useful for MUDs where you send a blank "+
+    "line to interrupt the current action).");
   add_element(el, "li", "To create a log file from your current "+
     "session, use the Log menu.  Unfortunately it is not possible "+
     "(due to browers' security restrictions) to automatically save "+

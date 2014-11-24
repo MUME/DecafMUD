@@ -9,6 +9,7 @@ most recent DecafMUD source, in MUD-agnostic way.
 - You can bind keys, depending on what your MUD owner configured.
 - The UI now sports Discworld's menus instead of a simple toolbar.
 - Better browser support (Chrome 16+, Firefox 11+, IE 10+).
+- You can clear the input field at once with shift+backspace.
 
 ## For MUD owners
 
