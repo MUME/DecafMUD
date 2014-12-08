@@ -36,6 +36,12 @@ var toolbar_menus = [
   ]
 ];
 
+var MENU_FILE    = 0,
+    MENU_LOG     = 1,
+    MENU_OPTIONS = 2,
+    MENU_HELP    = 3,
+    MI_SUBMENU = 3;
+
 /**
  * =======================================
  * Functionality for generating the menus.
