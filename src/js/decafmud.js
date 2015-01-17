@@ -1547,11 +1547,9 @@ DecafMUD.prototype.decode = function(data) {
 DecafMUD.prototype.encode = function(data) {
 	return DecafMUD.plugins.Encoding[this.options.encoding].encode(data); }
 
-/** Read through data, only stopping for TELNET sequences. Pass data through to
- *  the display handler. */
+/** Read through data, only stopping for TELNET sequences. Pass data through
+ *  towards the display handler. */
 DecafMUD.prototype.processBuffer = function() {
-	if ( ! this.display ) { return; }
-	
 	var data = this.inbuf.join(''), IAC = DecafMUD.TN.IAC, left='';
 	this.inbuf = [];
 	
@@ -1563,14 +1561,14 @@ DecafMUD.prototype.processBuffer = function() {
 			
 			
 			
-			this.display.handleData(enc[0]);
+                        this.handleText(enc[0]);
 			this.inbuf.splice(1,0,enc[1]);
 			break;
 		}
 		
 		else if ( ind > 0 ) {
 			var enc = this.decode(data.substr(0,ind));
-			this.display.handleData(enc[0]);
+                        this.handleText(enc[0]);
 			left = enc[1];
 			data = data.substr(ind);
 		}
@@ -1583,6 +1581,27 @@ DecafMUD.prototype.processBuffer = function() {
 		}
 		data = left + out;
 	}
+}
+
+/** Filters text (if a filter is installed) and sends it to the display
+ *  handler. */
+DecafMUD.prototype.handleText = function(text) {
+
+        if ( this.options.textFilter )
+                text = this.options.textFilter(text);
+
+        if ( this.display )
+                this.display.handleData(text);
+}
+
+/** A filter is useful for MUDs that require pre-processing. For example, MUME
+ *  makes it easier to parse its output by adding pseudo-XML tags. They need to
+ *  be parsed and removed from what's shown to the user.
+ *
+ *  By default, there is no filter set (evaluates to false). */
+DecafMUD.prototype.setTextFilter = function(filter) {
+
+        this.options.textFilter = filter;
 }
 
 /** Read an IAC sequence from the supplied data. Then return either the remaining
