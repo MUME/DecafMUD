@@ -225,7 +225,24 @@ DecafMUD.plugins = {
 	/** These plugins provide extra telnet options for adding more sophisticated
 	 *  client/server interaction to DecafMUD.
 	 * @type Object */
-	Telopt		: {}
+	Telopt		: {},
+
+        /** These plugins filter text sent by the MUD after the Telnet
+         * sequences are interpreted and removed, but it still contains the
+         * ANSI escape sequences (colors etc).
+         *
+         * These plugins must provide the following functions:
+         * - filterInputText( text ), returns the modified text.
+         * - connected(), for clearing any internal state upon (re)connecting.
+         *
+         * You can enable the registered plugin to use with the
+         * "textinputfilter" DecafMUD instance option.
+         *
+         * Example usage:  MUME makes it easier to parse its output by adding
+         * pseudo-XML tags. They need to be parsed and removed from what's
+         * shown to the user.
+         */
+        TextInputFilter : {}
 };
 
 /** This plugin handles conversion between raw data and iso-8859-1 encoded
@@ -1304,6 +1321,9 @@ DecafMUD.prototype.initUI = function() {
 
 /** The final step. Instantiate all our plugins. */
 DecafMUD.prototype.initFinal = function() {
+
+	var textInputFilterCtor, o;
+
 	this.need.push('.');
 	this.updateSplash(true,"Initializing triggers system...");
 	this.need.shift();
@@ -1312,14 +1332,21 @@ DecafMUD.prototype.initFinal = function() {
 	this.updateSplash(true,"Initializing TELNET extensions...");
 	
 	for(var k in DecafMUD.plugins.Telopt) {
-		var o = DecafMUD.plugins.Telopt[k];
+		o = DecafMUD.plugins.Telopt[k];
 		if ( typeof o === 'function' ) {
 			this.telopt[k] = new o(this);
 		} else {
 			this.telopt[k] = o;
 		}
 	}
-	
+
+	this.need.push('.');
+	this.updateSplash(true,"Initializing filters...");
+
+	textInputFilterCtor = DecafMUD.plugins.TextInputFilter[this.options.textinputfilter];
+	if ( textInputFilterCtor )
+		this.textInputFilter = new textInputFilterCtor(this);
+
 	// We're loaded. Try to connect.
 	this.loaded = true;
 	this.ui.endSplash();
@@ -1420,7 +1447,10 @@ DecafMUD.prototype.socketConnected = function() {
 		if ( this.telopt[k] && this.telopt[k].connect ) {
 			this.telopt[k].connect(); }
 	}
-	
+
+	if ( this.textInputFilter )
+		this.textInputFilter.connected();
+
 	// Show that we're connected.
 	if ( this.ui && this.ui.connected ) {
 		this.ui.connected(); }
@@ -1550,30 +1580,30 @@ DecafMUD.prototype.encode = function(data) {
 /** Read through data, only stopping for TELNET sequences. Pass data through
  *  towards the display handler. */
 DecafMUD.prototype.processBuffer = function() {
-	var data = this.inbuf.join(''), IAC = DecafMUD.TN.IAC, left='';
+	var enc, data, ind, out;
+
+	data = this.inbuf.join(''), IAC = DecafMUD.TN.IAC, left='';
 	this.inbuf = [];
 	
 	// Loop through the string.
 	while ( data.length > 0 ) {
-		var ind = data.indexOf(IAC);
+		ind = data.indexOf(IAC);
 		if ( ind === -1 ) {
-			var enc = this.decode(data);
+			enc = this.decode(data);
 			
-			
-			
-                        this.handleText(enc[0]);
+			this.handleInputText(enc[0]);
 			this.inbuf.splice(1,0,enc[1]);
 			break;
 		}
 		
 		else if ( ind > 0 ) {
-			var enc = this.decode(data.substr(0,ind));
-                        this.handleText(enc[0]);
+			enc = this.decode(data.substr(0,ind));
+			this.handleInputText(enc[0]);
 			left = enc[1];
 			data = data.substr(ind);
 		}
 		
-		var out = this.readIAC(data);
+		out = this.readIAC(data);
 		if ( out === false ) {
 			// Ensure old data goes to the very beginning.
 			this.inbuf.splice(1,0,left + data);
@@ -1585,23 +1615,13 @@ DecafMUD.prototype.processBuffer = function() {
 
 /** Filters text (if a filter is installed) and sends it to the display
  *  handler. */
-DecafMUD.prototype.handleText = function(text) {
+DecafMUD.prototype.handleInputText = function(text) {
 
-        if ( this.options.textFilter )
-                text = this.options.textFilter(text);
+	if ( this.textInputFilter )
+		text = this.textInputFilter.filterInputText(text);
 
-        if ( this.display )
-                this.display.handleData(text);
-}
-
-/** A filter is useful for MUDs that require pre-processing. For example, MUME
- *  makes it easier to parse its output by adding pseudo-XML tags. They need to
- *  be parsed and removed from what's shown to the user.
- *
- *  By default, there is no filter set (evaluates to false). */
-DecafMUD.prototype.setTextFilter = function(filter) {
-
-        this.options.textFilter = filter;
+	if ( this.display )
+		this.display.handleData(text);
 }
 
 /** Read an IAC sequence from the supplied data. Then return either the remaining
@@ -1815,6 +1835,7 @@ DecafMUD.options = {
 	socket			: 'flash',
 	interface		: 'simple',
 	language		: 'autodetect',
+	textinputfilter		: '',
 	
 	// Loading Settings
 	jslocation		: undefined, // undefined = This script's location
