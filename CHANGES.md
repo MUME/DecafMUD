@@ -1,3 +1,6 @@
+# Changes in 0.10.0 (unreleased)
+
+- Add an API for an input filter plugin.
 
 # Changes in 0.9.1 (Nov 2014)
 
