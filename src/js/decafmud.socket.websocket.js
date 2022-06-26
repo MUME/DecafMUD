@@ -198,14 +198,7 @@ DecafWebSocket.prototype.onMessage = function(websocket, event) {
 
 	var reader = new FileReader();
 	reader.onload = function(e) {
-		var u8array = new Uint8Array(e.target.result);
-		var binstr = '';
-		var i;
-
-		for (i = 0; i < u8array.length; ++i)
-			binstr += String.fromCharCode(u8array[i]);
-
-		this.decaf.socketData(binstr);
+		this.decaf.socketData(new Uint8Array(e.target.result));
 	}.bind(this);
 	reader.readAsArrayBuffer(event.data);
 }
