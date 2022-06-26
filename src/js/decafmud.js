@@ -661,18 +661,36 @@ tCHARSET.prototype._sb = function(data) {
 		var sep = data.charAt(0);
 		data = data.substr(1).split(sep);
 		
-		// Find the first one we accept.
-		var e = undefined, o;
-		for(var i=0;i < data.length; i++) {
-			o = data[i];
-			for(var k in DecafMUD.plugins.Encoding) {
-				if ( o === k || o === DecafMUD.plugins.Encoding[k].proper ) {
-					e = k;
-					break; }
+		// Check if the preferred encoding is in data
+		var e, o;
+		for (var i of this.decaf.options.encoding_order) {
+			e = DecafMUD.plugins.Encoding[i];
+			if (e === undefined || e.proper === undefined)
+				continue;
+			if (data.includes(i)) {
+				o = i;
+				e = i;
+				break;
 			}
-			if ( e ) { break; }
+			if (data.includes(e.proper)) {
+				o = e.proper;
+				e = i;
+				break;
+			}
 		}
 		
+		// Find the first one we accept.
+		if (e === undefined) {
+			for(var i=0;i < data.length; i++) {
+				o = data[i];
+				for(var k in DecafMUD.plugins.Encoding) {
+					if ( o === k || o === DecafMUD.plugins.Encoding[k].proper ) {
+						e = k;
+						break; }
+				}
+				if ( e ) { break; }
+			}
+		}
 		if ( e !== undefined ) {
 			this.decaf.setEncoding(e);
 			this.decaf.sendIAC(t.IAC + t.SB + t.CHARSET + '\x02' + o + t.IAC + t.SE);
@@ -1831,7 +1849,7 @@ DecafMUD.options = {
 	// Plugins to use
 	storage			: 'standard',
 	display			: 'standard',
-	encoding		: 'iso88591',
+	encoding		: 'utf8',
 	socket			: 'flash',
 	interface		: 'simple',
 	language		: 'autodetect',
