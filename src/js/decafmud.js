@@ -723,6 +723,37 @@ tCHARSET.prototype._sb = function(data) {
 DecafMUD.plugins.Telopt[t.CHARSET] = tCHARSET;
 
 
+/** Handles the telopt COMPRESSv2 (MCCP2) */
+var tCOMPRESSv2 = function(decaf) {
+	// Thanks, https://mudhalla.net/tintin/protocols/mccp/
+	this.decaf = decaf;
+	this.decaf.startCompressV2 = false;
+	this.decaf.loadScript('inflate_stream.min.js'); // https://github.com/imaya/zlib.js/blob/develop/bin/inflate_stream.min.js
+}
+tCOMPRESSv2.prototype._will = function() {
+	if (this.decaf.options.socket == 'flash') {
+		this.decaf.debugString('Flash COMPRESSv2 support has not been implemented');
+		return false;
+	}
+	if (Zlib === undefined) {
+		this.decaf.debugString('Unable to load Zlib.js for COMPRESSv2 support');
+		return false;
+	}
+	return true;
+}
+tCOMPRESSv2.prototype._sb = function() {
+	this.decaf.debugString('RCVD ' + DecafMUD.debugIAC(t.IAC + t.SB + t.COMPRESSv2 + t.IAC + t.SE ));
+	this.decaf.startCompressV2 = true;
+ }
+DecafMUD.plugins.Telopt[t.COMPRESSv2] = tCOMPRESSv2;
+
+DecafMUD.prototype.disableMCCP2 = function() {
+	this.sendIAC(t.IAC + t.DONT + t.COMPRESSv2);
+	this.startCompressV2 = false;
+	this.decompressStream = undefined;
+	this.inbuf = [];
+}
+
 /** Read a string of MSDP-formatted variables and return an object with those
  *  variables in an easy-to-use format. This calls itself recursively, and
  *  returns an array. The first item being the object, and the second being
@@ -1492,6 +1523,10 @@ DecafMUD.prototype.socketClosed = function() {
 	// Clear the buffer to ensure we don't enter into a bad state on reconnect.
 	this.inbuf = [];
 	
+	// Disable MCCP2 compression, for the same reason
+	this.decompressStream = undefined;
+	this.startCompressV2 = false;
+	
 	// Should we be reconnecting?
 	if ( this.options.autoreconnect ) {
 		this.connect_try++;
@@ -1532,6 +1567,18 @@ DecafMUD.prototype.socketClosed = function() {
 /** Called by the socket when data arrives. */
 DecafMUD.prototype.socketData = function(data) {
 	// Push the text onto the inbuf.
+
+	if (this.decompressStream !== undefined) {
+		// Decompress it first!
+		try {
+			data = this.decompressStream.decompress(data);
+		} catch (e) {
+			this.error('MCCP2 compression disabled because ' + e);
+			this.disableMCCP2();
+			return;
+		}
+	}
+	
 	this.inbuf.push(data);
 	
 	// If we've finished loading, handle it.
@@ -1599,16 +1646,24 @@ DecafMUD.prototype.encode = function(data) {
  *  towards the display handler. */
 DecafMUD.prototype.processBuffer = function() {
 	var enc, data, ind, out;
-
-	data = this.inbuf.join(''), IAC = DecafMUD.TN.IAC, left='';
+	data = [];
+	// Each element from inbuf can be either a string (from a Flash socket, for example) or a Uint8Array from a websocket. Either way, each element will be concatenated together as a string
+	for (i of this.inbuf) {
+		if (typeof(i) == 'string') { // If it's a string, just keep it. No need to convert
+			data.push(i);
+			continue;
+		}
+		// Converts a Uint8Array to a string
+		data.push(Array.from(i).map(charCode=>String.fromCharCode(charCode)).join(''));
+	}
+	data = data.join('');
+	var IAC = DecafMUD.TN.IAC, left='';
 	this.inbuf = [];
-	
 	// Loop through the string.
 	while ( data.length > 0 ) {
 		ind = data.indexOf(IAC);
 		if ( ind === -1 ) {
 			enc = this.decode(data);
-			
 			this.handleInputText(enc[0]);
 			this.inbuf.splice(1,0,enc[1]);
 			break;
@@ -1617,17 +1672,33 @@ DecafMUD.prototype.processBuffer = function() {
 		else if ( ind > 0 ) {
 			enc = this.decode(data.substr(0,ind));
 			this.handleInputText(enc[0]);
+			// left is data that comes before the IAC
 			left = enc[1];
 			data = data.substr(ind);
 		}
 		
+		// out is data after the IAC
 		out = this.readIAC(data);
+		if (this.startCompressV2) {
+			try {
+				// start decompressing the rest of the stream
+				this.startCompressV2 = false;
+				this.decompressStream = new Zlib.InflateStream();
+				var compressed = out.split('').map(char=>char.charCodeAt(0));
+				var decompressed = Array.from(this.decompressStream.decompress(compressed));
+				out = decompressed.map(charCode=>String.fromCharCode(charCode)).join('');
+			} catch(e) {
+				this.error('MCCP2 compression disabled because ' + e);
+				this.disableMCCP2();
+			}
+		}
 		if ( out === false ) {
 			// Ensure old data goes to the very beginning.
 			this.inbuf.splice(1,0,left + data);
 			break;
 		}
 		data = left + out;
+		
 	}
 }
 
@@ -1872,7 +1943,7 @@ DecafMUD.options = {
 		handlecolor	: true,
 		fgclass		: 'c',
 		bgclass		: 'b',
-        fntclass    : 'fnt',
+		fntclass	: 'fnt',
 		inputfg		: '-7',
 		inputbg		: '-0'
 	},
