@@ -494,7 +494,7 @@ Display.prototype.message = function(text, className, needLine) {
 	user know they have have content to read if they scroll down. */
 Display.prototype.shouldScroll = function(addTarget) {
 	if ( this.willScroll !== undefined || this._display.style.overflowY === 'hidden' ) { return; }
-	this.willScroll = this._display.scrollTop >= (this._display.scrollHeight - this._display.offsetHeight);
+	this.willScroll = this._display.scrollTop + 1>= (this._display.scrollHeight - this._display.offsetHeight);
 	
 	// If we aren't scrolling, and the element isn't there, add our scroll helper.
 	if ( addTarget !== false && this.willScroll === false && !this.scrollTarget) {
