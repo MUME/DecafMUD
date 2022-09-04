@@ -71,9 +71,10 @@ var Display = function(decaf, ui, disp) {
 	    if ((this.display.clientHeight < (window.innerHeight * this.decaf.options.set_display.maxscreens)) || (this.display.children.length < this.decaf.options.set_display.minelements)) {
 	        return;
 	    }
-	    height = 0;
-	    elems = [];
-	    while (height < (this.display.clientHeight - (window.innerHeight * this.decaf.options.set_display.maxscreens))) {
+	    let height = 0;
+	    let elems = [];
+	    let targetHeight = (this.display.clientHeight - (window.innerHeight * this.decaf.options.set_display.maxscreens));
+	    while (height < targetHeight) {
 	        height += this.display.children[elems.length].offsetHeight;
 	        elems.push(this.display.children[elems.length]);
 	    }
