@@ -71,8 +71,15 @@ var Display = function(decaf, ui, disp) {
 	    if ((this.display.clientHeight < (window.innerHeight * this.decaf.options.set_display.maxscreens)) || (this.display.children.length < this.decaf.options.set_display.minelements)) {
 	        return;
 	    }
-	    this.display.children[0].remove();
-	    window.setTimeout(this.truncateHeight, 100);
+	    height = 0;
+	    elems = [];
+	    while (height < (this.display.clientHeight - (window.innerHeight * this.decaf.options.set_display.maxscreens))) {
+	        height += this.display.children[elems.length].offsetHeight;
+	        elems.push(this.display.children[elems.length]);
+	    }
+	    for (i of elems) {
+	        i.remove();
+	    }
 	}.bind(this);
 	
 	// Attach the mutation event (to check for max lines)
