@@ -1939,6 +1939,8 @@ DecafMUD.options = {
 	
 	// Display Settings
 	set_display		: {
+	    maxscreens  : 100, // Once the height of all the text gets to this many times the innerHeight, reduce it
+	    minelements : 10, // If there are only this many elements, do not truncate it (prevents immediate removal of longer sections of text)
 		handlecolor	: true,
 		fgclass		: 'c',
 		bgclass		: 'b',

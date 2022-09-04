@@ -66,6 +66,18 @@ var Display = function(decaf, ui, disp) {
 		e.preventDefault();
 	});
 	
+	// Function to check screen length vs display length
+	this.truncateHeight = function() {
+	    if ((this.display.clientHeight < (window.innerHeight * this.decaf.options.set_display.maxscreens)) || (this.display.children.length < this.decaf.options.set_display.minelements)) {
+	        return;
+	    }
+	    this.display.children[0].remove();
+	    window.setTimeout(this.truncateHeight, 100);
+	}.bind(this);
+	
+	// Attach the mutation event (to check for max lines)
+	new MutationObserver(this.truncateHeight).observe(this.display, {childList: true});
+	
 	// Store this in DecafMUD.
 	this.decaf.loaded_plugs.display = this;
 	
