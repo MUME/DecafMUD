@@ -66,26 +66,6 @@ var Display = function(decaf, ui, disp) {
 		e.preventDefault();
 	});
 	
-	// Function to check screen length vs display length
-	this.truncateHeight = function() {
-	    if ((this.display.clientHeight < (window.innerHeight * this.decaf.options.set_display.maxscreens)) || (this.display.children.length < this.decaf.options.set_display.minelements)) {
-	        return;
-	    }
-	    let height = 0;
-	    let elems = [];
-	    let targetHeight = (this.display.clientHeight - (window.innerHeight * this.decaf.options.set_display.maxscreens));
-	    while (height < targetHeight) {
-	        height += this.display.children[elems.length].offsetHeight;
-	        elems.push(this.display.children[elems.length]);
-	    }
-	    for (i of elems) {
-	        i.remove();
-	    }
-	}.bind(this);
-	
-	// Attach the mutation event (to check for max lines)
-	new MutationObserver(this.truncateHeight).observe(this.display, {childList: true});
-	
 	// Store this in DecafMUD.
 	this.decaf.loaded_plugs.display = this;
 	
@@ -95,6 +75,9 @@ var Display = function(decaf, ui, disp) {
 	
 	// Clear the display, initializing the default state as well.
 	this.clear();
+	
+	// Setup the "truncate lock"
+	this.truncateLock = false;
 	
 	// Display the DecafMUD banner.
 	this.message('<br><a href="https://github.com/MUME/DecafMUD">DecafMUD</a> v' + DecafMUD.version + ' by Stendec &lt;<a href="mailto:stendec365@gmail.com">stendec365@gmail.com</a>&gt;<br>');
@@ -272,6 +255,25 @@ Display.prototype.processData = function() {
 	//	d._display.setAttribute('aria-busy',false);
 	//	d.scroll();
 	//},50);
+	
+	this.truncateLines();
+}
+
+/** Truncate lines based on preconfigured settings */
+Display.prototype.truncateLines = function() {
+	if (this.truncateLock || (this.display.clientHeight < (window.innerHeight * this.decaf.options.set_display.maxscreens)) || (this.display.children.length < this.decaf.options.set_display.minelements)) {
+	    return;
+	}
+	this.truncateLock = true; // Prevent parallel instances
+    let height = 0;
+    let elems = [];
+    let targetHeight = (this.display.clientHeight - (window.innerHeight * this.decaf.options.set_display.maxscreens));
+    while ((height < targetHeight) && (this.display.children.length > elems.length)) {
+        height += this.display.children[elems.length].offsetHeight;
+        elems.push(this.display.children[elems.length]);
+    }
+    elems.forEach(i => i.remove());
+    this.truncateLock = false; // Release the lock
 }
 
 /** Read an ANSI sequence from the provided data and handle it, then return the
