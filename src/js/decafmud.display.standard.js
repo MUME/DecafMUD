@@ -72,7 +72,7 @@ var Display = function(decaf, ui, disp) {
 	// Any HTML currently within the display is our splash text.
 	this.splash		= this.display.innerHTML;
 	this.orig_title	= null;
-	
+
 	// Clear the display, initializing the default state as well.
 	this.clear();
 	
@@ -259,16 +259,16 @@ Display.prototype.processData = function() {
 /** Truncate lines based on preconfigured settings */
 Display.prototype.truncateLines = function() {
 	if ((this.display.clientHeight < (window.innerHeight * this.decaf.options.set_display.maxscreens)) || (this.display.children.length < this.decaf.options.set_display.minelements)) {
-	    return;
+		return;
 	}
-    let height = 0;
-    let elems = [];
-    let targetHeight = (this.display.clientHeight - (window.innerHeight * this.decaf.options.set_display.maxscreens));
-    while ((height < targetHeight) && (this.display.children.length > elems.length)) {
-        height += this.display.children[elems.length].offsetHeight;
-        elems.push(this.display.children[elems.length]);
-    }
-    elems.forEach(i => i.remove());
+	let height = 0;
+	let elems = [];
+	let targetHeight = (this.display.clientHeight - (window.innerHeight * this.decaf.options.set_display.maxscreens));
+	while ((height < targetHeight) && (this.display.children.length > elems.length)) {
+		height += this.display.children[elems.length].offsetHeight;
+		elems.push(this.display.children[elems.length]);
+	}
+	elems.forEach(i => i.remove());
 }
 
 /** Read an ANSI sequence from the provided data and handle it, then return the
@@ -507,7 +507,7 @@ Display.prototype.message = function(text, className, needLine) {
 }
 
 /** Determine if we should be scrolling to the bottom of the output, and do so
-    after a short delay if we should. Otherwise, display an element letting the
+	after a short delay if we should. Otherwise, display an element letting the
 	user know they have have content to read if they scroll down. */
 Display.prototype.shouldScroll = function(addTarget) {
 	if ( this.willScroll !== undefined || this._display.style.overflowY === 'hidden' ) { return; }

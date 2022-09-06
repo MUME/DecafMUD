@@ -190,7 +190,7 @@ DecafMUD.prototype.required		= 0;
  * // Add the plugin MyPluginClass to DecafMUD as my_plugin.
  * DecafMUD.plugins.Extra.my_plugin = MyPluginClass;
  * @namespace All the available plugins for {@link DecafMUD}, in one easy-to-access
-              tree. */
+			  tree. */
 DecafMUD.plugins = {
 	/** These plugins provide support for MUD output.
 	 * @type Object */
@@ -227,22 +227,22 @@ DecafMUD.plugins = {
 	 * @type Object */
 	Telopt		: {},
 
-        /** These plugins filter text sent by the MUD after the Telnet
-         * sequences are interpreted and removed, but it still contains the
-         * ANSI escape sequences (colors etc).
-         *
-         * These plugins must provide the following functions:
-         * - filterInputText( text ), returns the modified text.
-         * - connected(), for clearing any internal state upon (re)connecting.
-         *
-         * You can enable the registered plugin to use with the
-         * "textinputfilter" DecafMUD instance option.
-         *
-         * Example usage:  MUME makes it easier to parse its output by adding
-         * pseudo-XML tags. They need to be parsed and removed from what's
-         * shown to the user.
-         */
-        TextInputFilter : {}
+		/** These plugins filter text sent by the MUD after the Telnet
+		 * sequences are interpreted and removed, but it still contains the
+		 * ANSI escape sequences (colors etc).
+		 *
+		 * These plugins must provide the following functions:
+		 * - filterInputText( text ), returns the modified text.
+		 * - connected(), for clearing any internal state upon (re)connecting.
+		 *
+		 * You can enable the registered plugin to use with the
+		 * "textinputfilter" DecafMUD instance option.
+		 *
+		 * Example usage:  MUME makes it easier to parse its output by adding
+		 * pseudo-XML tags. They need to be parsed and removed from what's
+		 * shown to the user.
+		 */
+		TextInputFilter : {}
 };
 
 /** This plugin handles conversion between raw data and iso-8859-1 encoded
@@ -259,18 +259,18 @@ DecafMUD.plugins.Encoding.iso88591 = {
 	proper : 'ISO-8859-1',
 	
 	/** Convert iso-8859-1 encoded text to unicode, by doing nothing.
-     * @example
-     * DecafMUD.plugins.Encoding.iso88591.decode("\xE2\x96\x93");
-     * // Becomes: "\xE2\x96\x93"
-     * @param {String} data The text to decode. */
+	 * @example
+	 * DecafMUD.plugins.Encoding.iso88591.decode("\xE2\x96\x93");
+	 * // Becomes: "\xE2\x96\x93"
+	 * @param {String} data The text to decode. */
 	decode : function(data) { return [data,'']; },
 	/** Convert unicode characters to iso-8859-1 encoded text, by doing
 	 *  nothing. Should probably add some sanity checks in later, but I
 	 *  don't really care for now.
-     * @example
-     * DecafMUD.plugins.Encoding.iso88591.encode("\xE2\x96\x93");
-     * // Becomes: "\xE2\x96\x93"
-     * @param {String} data The text to encode. */
+	 * @example
+	 * DecafMUD.plugins.Encoding.iso88591.encode("\xE2\x96\x93");
+	 * // Becomes: "\xE2\x96\x93"
+	 * @param {String} data The text to encode. */
 	encode : function(data) { return data; }
 };
 
@@ -283,10 +283,10 @@ DecafMUD.plugins.Encoding.utf8 = {
 	proper : 'UTF-8',
 	
 	/** Convert UTF-8 sequences to unicode characters.
-     * @example
-     * DecafMUD.plugins.Encoding.utf8.decode("\xE2\x96\x93");
-     * // Becomes: "\u2593"
-     * @param {String} data The text to decode. */
+	 * @example
+	 * DecafMUD.plugins.Encoding.utf8.decode("\xE2\x96\x93");
+	 * // Becomes: "\u2593"
+	 * @param {String} data The text to decode. */
 	decode : function(data) {
 		try { return [decodeURIComponent( escape( data ) ), '']; }
 		catch(err) {
@@ -322,10 +322,10 @@ DecafMUD.plugins.Encoding.utf8 = {
 		} },
 	
 	/** Encode unicode characters into UTF-8 sequences.
-     * @example
-     * DecafMUD.plugins.Encoding.utf8.encode("\u2593");
-     * // Becomes: "\xE2\x96\x93"
-     * @param {String} data The text to encode. */
+	 * @example
+	 * DecafMUD.plugins.Encoding.utf8.encode("\u2593");
+	 * // Becomes: "\xE2\x96\x93"
+	 * @param {String} data The text to encode. */
 	encode : function(data) {
 		try { return unescape( encodeURIComponent( data ) ); }
 		catch(err) {
@@ -1399,7 +1399,7 @@ DecafMUD.prototype.initFinal = function() {
 	this.loaded = true;
 	this.ui.endSplash();
 	
-        /*
+		/*
 	// If this is IE, show a warning.
 	if ( /MSIE/.test(navigator.userAgent) && this.ui.infoBar ) {
 		var msg = 'You may experience poor performance and UI glitches using ' +
@@ -1456,11 +1456,11 @@ DecafMUD.prototype.connectFail = function() {
 DecafMUD.prototype.reconnect = function() {
   this.connect_try++;
   //if ( this.connect_try < this.options.reconnect_tries ) {
-    var d = this;
-    if ( d.ui && d.ui.connecting ) {
-      d.ui.connecting();
-    }
-    d.socket.connect();
+	var d = this;
+	if ( d.ui && d.ui.connecting ) {
+	  d.ui.connecting();
+	}
+	d.socket.connect();
   //}
 }
 
@@ -1939,8 +1939,8 @@ DecafMUD.options = {
 	
 	// Display Settings
 	set_display		: {
-	    maxscreens  : 100, // Once the height of all the text gets to this many times the innerHeight, reduce it
-	    minelements : 10, // If there are only this many elements, do not truncate it (prevents immediate removal of longer sections of text)
+		maxscreens  : 100, // Once the height of all the text gets to this many times the innerHeight, reduce it
+		minelements : 10, // If there are only this many elements, do not truncate it (prevents immediate removal of longer sections of text)
 		handlecolor	: true,
 		fgclass		: 'c',
 		bgclass		: 'b',
